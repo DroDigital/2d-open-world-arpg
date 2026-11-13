@@ -184,7 +184,11 @@ export class UI {
     if (inp.pressed.confirm || inp.pressed.attack || inp.pressed.jump) items[T.sel].fn();
   }
   titleItems() {
-    const g = this.g, has = typeof localStorage !== "undefined" && !!localStorage.getItem("shardlight-save");
+    const g = this.g;
+    let has = false;
+    try {
+      has = typeof localStorage !== "undefined" && !!localStorage.getItem("shardlight-save");
+    } catch {}
     const items = [];
     if (has) items.push({ label: "CONTINUE", fn: () => this.startGame(true) });
     items.push({ label: "NEW GAME", fn: () => this.startGame(false) });

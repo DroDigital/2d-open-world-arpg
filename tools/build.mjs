@@ -20,4 +20,13 @@ writeFileSync(join(OUT, "index.html"), html.replace('<script type="module" src="
 // one file: the script inline (escaped so "</script" can't end it early)
 const inline = (banner + js).replace(/<\/script/gi, "<\\/script");
 writeFileSync(join(OUT, "shardlight.html"), html.replace('<script type="module" src="src/main.js"></script>', `<script type="module">\n${inline}\n</script>`));
+// for hosts that wrap a page in their own document: no doctype, html, head or body tags of ours
+const page = html
+  .replace('<script type="module" src="src/main.js"></script>', `<script type="module">\n${inline}\n</script>`)
+  .replace(/<!doctype html>\s*/i, "").replace(/<\/?html[^>]*>\s*/gi, "").replace(/<\/?head>\s*/gi, "").replace(/<\/?body>\s*/gi, "")
+  .replace(/<meta charset="utf-8">\s*/i, "").replace(/<meta name="viewport"[^>]*>\s*/i, "")
+  .replace("<style>", '<meta name="claude:viewport-fit-sides" content="cover">\n<style>')
+  .replace(":root { color-scheme: dark; }", ":root { color-scheme: dark; --bg: #07060d; --fg: #c8c4d8; --gold: #ffd84a; }")
+  .replace("html, body { margin: 0; height: 100%; background: #07060d;", "html, body { margin: 0; height: 100%; background: var(--bg);");
+writeFileSync(join(OUT, "page.html"), page);
 console.log(`dist/game.js ${(js.length / 1024).toFixed(0)} KB, dist/shardlight.html ${((js.length + html.length) / 1024).toFixed(0)} KB`);
