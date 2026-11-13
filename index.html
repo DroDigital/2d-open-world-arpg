@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Shardlight</title>
+<meta name="description" content="Shardlight: a side-scrolling open-world action RPG where every effect is drawn in code with pixelfx.">
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; height: 100%; background: #07060d; overflow: hidden; touch-action: none; }
+  body { display: grid; place-items: center; font: 14px system-ui, sans-serif; color: #c8c4d8; }
+  #game { image-rendering: pixelated; image-rendering: crisp-edges; display: block; background: #000; box-shadow: 0 0 0 1px #1a1726, 0 20px 60px #000c; }
+  #start { position: fixed; inset: 0; display: grid; place-items: center; background: radial-gradient(#15122a, #07060d); cursor: pointer; }
+  #start b { font-size: 28px; letter-spacing: 4px; color: #ffd84a; }
+  #start p { margin: 8px 0 0; opacity: .7; text-align: center; }
+  #touch { position: fixed; inset: 0; pointer-events: none; display: none; }
+  #touch.on { display: block; }
+  #touch button { pointer-events: auto; position: absolute; width: 58px; height: 58px; border-radius: 50%; border: 2px solid #ffffff40; background: #ffffff18; color: #fff; font: 600 13px system-ui; touch-action: none; user-select: none; -webkit-user-select: none; }
+  #touch button:active { background: #ffffff40; }
+</style>
+</head>
+<body>
+<canvas id="game" width="320" height="180" aria-label="Shardlight game screen"></canvas>
+<div id="start"><div><b>SHARDLIGHT</b><p>click, tap or press any key to begin<br>sound on</p></div></div>
+<div id="touch">
+  <button data-a="left" style="left:14px;bottom:70px">&#9664;</button>
+  <button data-a="right" style="left:80px;bottom:70px">&#9654;</button>
+  <button data-a="up" style="left:47px;bottom:128px">&#9650;</button>
+  <button data-a="down" style="left:47px;bottom:12px">&#9660;</button>
+  <button data-a="jump" style="right:14px;bottom:20px">JUMP</button>
+  <button data-a="attack" style="right:80px;bottom:46px">HIT</button>
+  <button data-a="dash" style="right:14px;bottom:86px">DASH</button>
+  <button data-a="s1" style="right:146px;bottom:16px;width:44px;height:44px">1</button>
+  <button data-a="s2" style="right:146px;bottom:66px;width:44px;height:44px">2</button>
+  <button data-a="s3" style="right:96px;bottom:110px;width:44px;height:44px">3</button>
+  <button data-a="s4" style="right:46px;bottom:146px;width:44px;height:44px">4</button>
+  <button data-a="interact" style="left:140px;bottom:16px;width:44px;height:44px">USE</button>
+  <button data-a="pause" style="right:14px;top:14px;width:44px;height:44px">||</button>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "shardlight",
+  "version": "1.0.0",
+  "description": "Shardlight: a side-scrolling open-world action RPG where every effect is drawn in code with pixelfx.",
+  "type": "module",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "build": "node tools/build.mjs",
+    "shot": "node tools/shot.mjs",
+    "test": "node tools/test.mjs",
+    "coverage": "node tools/coverage.mjs",
+    "fx:check": "node vendor/pixelfx/tools/check.mjs",
+    "fx:render": "node vendor/pixelfx/tools/render.mjs",
+    "fx:gallery": "node vendor/pixelfx/tools/serve.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.10"
+  }
+}
