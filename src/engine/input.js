@@ -25,6 +25,7 @@ export class Input {
     this.raw = new Set();
     this.virtual = new Set(); // touch buttons and scripted presses
     this.queued = new Set(); // one-tick presses
+    this.hits = new Set(); // keys pressed since the last poll, even if already let go
     this.lastDevice = "keyboard";
     this.anyPressed = false;
     for (const a of ACTIONS) this.down[a] = this.prev[a] = false;
@@ -33,6 +34,7 @@ export class Input {
     win.addEventListener("keydown", (e) => {
       if (KEYS[e.code] || e.code === "Tab") e.preventDefault();
       this.raw.add(e.code);
+      if (!e.repeat) this.hits.add(e.code);
       this.lastDevice = "keyboard";
     });
     win.addEventListener("keyup", (e) => this.raw.delete(e.code));
@@ -50,6 +52,10 @@ export class Input {
     const now = {};
     for (const a of ACTIONS) now[a] = false;
     for (const code of this.raw) for (const a of KEYS[code] ?? []) now[a] = true;
+    // a tap shorter than a frame still counts once
+    const tapped = {};
+    for (const code of this.hits) for (const a of KEYS[code] ?? []) if (!now[a]) tapped[a] = now[a] = true;
+    this.hits.clear();
     for (const a of this.virtual) now[a] = true;
     for (const a of this.queued) now[a] = true;
     const pads = typeof navigator !== "undefined" && navigator.getGamepads ? navigator.getGamepads() : [];

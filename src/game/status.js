@@ -100,7 +100,8 @@ export class Status {
     if (!e.st) return;
     const g = this.g;
     for (const k of Object.keys(e.st)) {
-      const S = STATUS[k], st = e.st[k];
+      const S = STATUS[k], st = e.st?.[k];
+      if (!st) continue; // cleared by something earlier this tick (a blow, a death)
       st.t += dt;
       if (st.inst?.live) {
         const a = e.actor?.();

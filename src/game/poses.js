@@ -8,7 +8,7 @@ const q12 = (t) => Math.floor(t * 12) / 12;
 
 export function idle(t, weapon) {
   const up = Math.floor(q12(t) * 1.5) & 1;
-  if (weapon) return { ...READY, weapon: weapon.rig, fx: 11, fy: -19 + up, sa: -0.9, crouch: 3 + up, bx: 7, by: -20 + up, ...(weapon.two ? { two: true } : {}) };
+  if (weapon) return { ...READY, weapon: weapon.rig, fx: 11, fy: -18 + up, sa: weapon.rig === "bow" ? -1.3 : 0.35, crouch: 3 + up, bx: 7, by: -19 + up, ...(weapon.two ? { two: true } : {}) };
   return { ...STAND, crouch: up, fy: -15 + up, by: -15 + up };
 }
 

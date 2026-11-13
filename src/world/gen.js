@@ -117,6 +117,8 @@ export function generate(seed = 7) {
   };
   entrance(300, 112, "THE HOLLOW CRYPT"); // in the woods' ruins
   entrance(520 + 30, 100, "GLIMMER CAVERNS - MIND THE DARK"); // the village well
+  // a lid of planks over the well: walk across it, or drop through (down + jump)
+  for (let x = 547; x <= 553; x++) set(x, surf[550], T.PLANK);
   entrance(860, 110, "MAGMA VEINS");
   entrance(150, 105, "RIME HOLLOWS");
   entrance(690, 96, "SUNKEN TEMPLE");

@@ -200,7 +200,7 @@ export class Bosses {
   onDamage(b, dmg, o) {
     const g = this.g;
     b.flash = 0.1;
-    if (dmg > b.maxHp * 0.06) g.fx.spawn("ui/health-bar-hit", 160, 166, { layer: "ui", from: Math.min(1, (b.hp + dmg) / b.maxHp), to: Math.max(0, b.hp / b.maxHp), seed: 2 });
+    if (dmg > b.maxHp * 0.06) g.fx.spawn("ui/health-bar-hit", 160, 136, { layer: "ui", from: Math.min(1, (b.hp + dmg) / b.maxHp), to: Math.max(0, b.hp / b.maxHp), seed: 2 });
     // phase two at half health: faster, angrier
     if (b.phase === 1 && b.hp < b.maxHp * 0.5) {
       b.phase = 2;

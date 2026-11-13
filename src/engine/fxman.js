@@ -91,15 +91,15 @@ function evict() {
     memos.delete(k);
   }
 }
-const RESERVED = new Set(["x", "y", "flip", "follow", "life", "layer", "memo", "back", "front", "delay", "onEnd", "dx", "dy", "tag", "actorKey", "ui", "speed", "z", "k", "lightK", "rate", "keep", "followFlip"]);
+const RESERVED = new Set(["x", "y", "flip", "follow", "life", "layer", "memo", "back", "front", "delay", "onEnd", "dx", "dy", "tag", "actorKey", "ui", "speed", "z", "k", "lightK", "rate", "keep", "followFlip", "behind"]);
 function memoFor(id, mod, o, flip) {
   const parts = [id, flip ? 1 : 0, o.actorKey ?? ""];
-  for (const k of Object.keys(o).sort()) if (!RESERVED.has(k) && k !== "actor") parts.push(k + "=" + JSON.stringify(o[k]));
+  for (const k of Object.keys(o).sort()) if (!RESERVED.has(k) && k !== "actor" && o[k] !== undefined) parts.push(k + "=" + JSON.stringify(o[k]));
   const key = parts.join("|");
   let m = memos.get(key);
   if (!m) {
     const clean = {};
-    for (const k of Object.keys(o)) if (!RESERVED.has(k)) clean[k] = o[k];
+    for (const k of Object.keys(o)) if (!RESERVED.has(k) && o[k] !== undefined) clean[k] = o[k];
     memos.set(key, (m = new Memo(mod, resolveOptions(mod.meta, clean), flip, 24)));
   }
   m.used = ++memoClock;
@@ -171,7 +171,7 @@ export class FxMan {
     };
     if (!memo) {
       const clean = {};
-      for (const k of Object.keys(o)) if (!RESERVED.has(k)) clean[k] = o[k];
+      for (const k of Object.keys(o)) if (!RESERVED.has(k) && o[k] !== undefined) clean[k] = o[k];
       inst.live = createFx(mod, { ...clean, x, y, flip: !!o.flip });
     }
     this.list.push(inst);
@@ -242,7 +242,7 @@ export class FxMan {
       const fade = i.stopAt === Infinity ? 1 : Math.max(0, 1 - (i.t - i.stopAt) / FADE);
       const ui = i.layer === "ui";
       const backF = ui ? screen.ui : i.layer === "act" ? screen.act : screen.back;
-      const frontF = ui ? screen.ui : i.layer === "act" ? screen.act : screen.front;
+      const frontF = ui ? screen.ui : i.layer === "act" ? screen.act : i.o.behind ? screen.back : screen.front;
       if (i.memo) {
         this.stats.memo++;
         const f = i.memo.frame(i.t * (i.o.rate ?? 1));

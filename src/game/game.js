@@ -379,28 +379,37 @@ export class Game {
     const h = this.hero, flash = h.flash > 0 && Math.floor(h.flash * 20) % 2 === 0;
     // the scarf: a little chain that trails from the neck
     const J = joints(h.pose), nx = h.x + (h.face > 0 ? J.neck[0] : -J.neck[0]), ny = h.y + J.neck[1] + 1;
-    h.scarf ??= Array.from({ length: 7 }, () => [nx, ny]);
+    h.scarf ??= Array.from({ length: 10 }, () => [nx, ny]);
     const sc = h.scarf;
     sc[0] = [nx - h.face * 1, ny];
+    const wind = this.world.biome(h.x).id === "frost" ? 0.5 : 0.2;
     for (let i = 1; i < sc.length; i++) {
       const p = sc[i], q = sc[i - 1];
-      p[0] += (-h.vx * 0.012 - h.face * 0.9 + Math.sin(this.time * 9 + i) * 0.35) ;
-      p[1] += 0.55 + Math.cos(this.time * 7 + i * 0.8) * 0.25 - Math.max(0, -h.vy) * 0.004;
+      p[0] += -h.vx * 0.016 - h.face * (0.6 + wind) + Math.sin(this.time * 8 + i * 0.9) * 0.45;
+      p[1] += 0.5 + Math.cos(this.time * 6 + i * 0.7) * 0.3 - Math.max(0, -h.vy) * 0.004 + Math.max(0, h.vy) * -0.006;
       const dx = p[0] - q[0], dy = p[1] - q[1], d = Math.hypot(dx, dy) || 1;
-      p[0] = q[0] + (dx / d) * 2.2;
-      p[1] = q[1] + (dy / d) * 2.2;
+      p[0] = q[0] + (dx / d) * 2;
+      p[1] = q[1] + (dy / d) * 2;
     }
-    const f = S.act, C1 = hex("#f53cd1"), C2 = hex("#a31f8a"), C3 = hex("#ff8fe6");
-    for (let i = 1; i < sc.length; i++) {
-      const [x0, y0] = sc[i - 1], [x1, y1] = sc[i];
-      for (let k = 0; k <= 3; k++) {
-        const x = Math.round(x0 + (x1 - x0) * (k / 3)) - f.ox, y = Math.round(y0 + (y1 - y0) * (k / 3)) - f.oy;
-        if (x >= 0 && y >= 0 && x < f.w - 1 && y < f.h - 1) {
-          f.color[y * f.w + x] = i < 2 ? C3 : C1;
-          if (i < sc.length - 1) f.color[(y + 1) * f.w + x] = C2;
+    const f = S.act, C1 = hex("#f53cd1"), C2 = hex("#a31f8a"), C3 = hex("#ff8fe6"), INK = hex("#120c18");
+    const dot = (x, y, c) => {
+      x = Math.round(x) - f.ox;
+      y = Math.round(y) - f.oy;
+      if (x >= 0 && y >= 0 && x < f.w && y < f.h) f.color[y * f.w + x] = c;
+    };
+    // an outline first, then the cloth: two pixels wide, lit on top
+    for (const pass of [0, 1])
+      for (let i = 1; i < sc.length; i++) {
+        const [x0, y0] = sc[i - 1], [x1, y1] = sc[i];
+        for (let k = 0; k <= 2; k++) {
+          const x = x0 + (x1 - x0) * (k / 2), y = y0 + (y1 - y0) * (k / 2), w = i < sc.length - 2 ? 1 : 0;
+          if (pass === 0) for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1 + w]]) dot(x + dx, y + dy, INK);
+          else {
+            dot(x, y, i < 3 ? C3 : C1);
+            if (w) dot(x, y + 1, C2);
+          }
         }
       }
-    }
     const tint = this.status.has(h, "star") ? [hex(["#ff6a6a", "#ffe066", "#6aff8a", "#6ab0ff", "#c684ff"][Math.floor(this.time * 15) % 5]), 0.45] : null;
     drawRig(S.act, h.pose, this.rpg.costume, h.x, h.y, { flip: h.face < 0, flash, tint, alpha: h.inv > 0 && !flash && h.state !== "dash" ? (Math.floor(this.time * 20) % 2 ? 1 : 0.6) : 1 });
     // a lantern's glow round the hero underground and at night

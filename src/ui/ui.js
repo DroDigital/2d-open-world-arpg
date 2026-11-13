@@ -162,8 +162,8 @@ export class UI {
       }
       if (tr.t >= tr.dur) this.trans = null;
     }
-    if (g.scene === "title") return this.titleInput(dt);
     if (this.dlg) return this.dlgInput(dt);
+    if (g.scene === "title") return this.titleInput(dt);
     if (this.shop) return this.shopInput();
     if (this.menu) return this.menuInput(dt);
     if (inp.pressed.pause || inp.pressed.menu) this.open("HERO");
@@ -641,12 +641,12 @@ const TAB_DRAW = {
       text(f, a, 104 + (i % 2) * 104, 86 + Math.floor(i / 2) * 9, COL.dim);
       text(f, String(b), 200 + (i % 2) * 104, 86 + Math.floor(i / 2) * 9, COL.text, { align: "right" });
     });
-    text(f, "SHARDS AND GIFTS", 104, 128, COL.gold);
+    text(f, "SHARDS", 104, 126, COL.gold);
     Object.entries(SHARDS).forEach(([k, s], i) => {
       const got = R.shards[k];
-      text(f, (got ? "* " : "- ") + s.name + (got ? ": " + s.desc : ""), 104, 137 + i * 6, got ? hex(s.pal[5]) : hex("#4a4458"));
+      text(f, (got ? "* " : "- ") + s.name.replace(" SHARD", "").replace(" Shard", ""), 104 + (i % 3) * 66, 135 + Math.floor(i / 3) * 8, got ? hex(s.pal[5]) : hex("#4a4458"));
     });
-    text(f, "SPACE: SPEND A POINT", 104, 166, COL.dim);
+    text(f, R.points ? "SPACE: SPEND A POINT" : "", 104, 156, COL.dim);
   },
   BAG(ui, f, m) {
     const g = ui.g, R = g.rpg, rows = bagRows(R);
@@ -674,7 +674,7 @@ const TAB_DRAW = {
   },
   SKILLS(ui, f, m) {
     const g = ui.g, S = g.skills, list = Object.keys(SKILLS), top = Math.max(0, Math.min(m.sel - 8, list.length - 17));
-    text(f, "SKILL POINTS " + S.points, 300, 28, S.points ? COL.gold : COL.dim, { align: "right" });
+    text(f, "SKILL POINTS " + S.points, 12, 166, S.points ? COL.gold : COL.dim);
     list.slice(top, top + 17).forEach((id, j) => {
       const i = top + j, s = SKILLS[id], y = 26 + j * 8, sel = i === m.sel, known = S.known.has(id);
       if (sel) fill(f, 10, y - 1, 168, 7, COL.sel, 0.25);

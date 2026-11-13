@@ -1,7 +1,7 @@
 {
-  "name": "dawnless",
+  "name": "shardlight",
   "version": "1.0.0",
-  "description": "Dawnless: a side-scrolling open-world action RPG painted entirely in code with pixelfx.",
+  "description": "Shardlight: a side-scrolling open-world action RPG where every effect is drawn in code with pixelfx.",
   "type": "module",
   "license": "MIT",
   "private": true,

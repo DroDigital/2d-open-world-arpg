@@ -9,7 +9,8 @@ import { glow } from "../engine/render.js";
 import { Enemy, overlap } from "./enemies.js";
 import { ENEMIES } from "../data/enemies.js";
 import { HIT } from "../data/fxtimes.js";
-import { RARITY, CONSUMABLES, MATERIALS } from "../data/items.js";
+import { RARITY, CONSUMABLES, MATERIALS, BASES } from "../data/items.js";
+import { ICONS } from "../ui/draw.js";
 import { TS } from "../world/tiles.js";
 
 const BUCKET = 256;
@@ -75,7 +76,7 @@ export class Ents {
       case "prop": {
         if (e.trigger) return this.trigger(e, dt, h, dx, dy);
         if (e.rainOnly && !g.director.raining) return this.sleep(e);
-        if (!e.inst || e.inst.dead) e.inst = g.fx.spawn(e.fx, e.x, e.y, { seed: (e.x | 0) % 97, ...(e.lightK ? { lightK: e.lightK } : {}), ...(e.opts ?? {}) });
+        if (!e.inst || e.inst.dead) e.inst = g.fx.spawn(e.fx, e.x, e.y, { seed: (e.x | 0) % 97, behind: !e.hazard, ...(e.lightK ? { lightK: e.lightK } : {}), ...(e.opts ?? {}) });
         if (e.hazard) this.hazard(e, dt, h, dx, dy);
         if (e.lift && Math.abs(dx) < 14 && h.y > e.y - 280 && h.y <= e.y + 2 && !h.dead) {
           h.vy = Math.max(-190, h.vy - 1400 * dt);
@@ -429,8 +430,13 @@ export class Ents {
     for (const p of this.pickups) {
       if (p.t < p.delay) continue;
       if (p.kind === "gear") {
-        const m = memoOf("pickups/loot-beam", { palette: RARITY[p.item.rarity].beam }, false);
-        blitMemo(screen, m, g.time, p.x, p.y + 4, { layer: "world" });
+        if (p.item.rarity >= 2) blitMemo(screen, memoOf("pickups/loot-beam", { palette: RARITY[p.item.rarity].beam }, false), g.time, p.x, p.y + 4, { layer: "world" });
+        else {
+          const f = screen.act, c = hex(RARITY[p.item.rarity].color), bob = Math.round(Math.sin(g.time * 3 + p.x) * 1.5);
+          const B = BASES[p.item.base], name = B.cls ?? { armor: "armor", helm: "helm", boots: "boots", ring: "ring", amulet: "amulet" }[B.slot];
+          iconAt(f, ICONS[name] ?? ICONS.ring, Math.round(p.x) - 7 - f.ox, Math.round(p.y) - 15 + bob - f.oy, c);
+          if (Math.sin(g.time * 4 + p.x) > 0.7) glow(f, p.x, p.y - 8, 10, c, 0.4);
+        }
         continue;
       }
       const [id, o] = PICKUP_FX[p.kind] ?? PICKUP_FX.crystal;
@@ -468,6 +474,15 @@ function drawSign(screen, e, flare) {
       if (px < 0 || py < 0 || px >= f.w || py >= f.h) continue;
       f.color[py * f.w + px] = x === -8 || x === 7 || y === 0 || y === 7 ? 0xff120c10 : flare ? (y === 3 ? hex("#ff4a3a") : W[0]) : y % 3 === 2 && x > -6 && x < 5 ? W[2] : W[0];
     }
+}
+function iconAt(f, rows, x, y, c) {
+  rows.forEach((r, j) => [...r].forEach((ch, i) => {
+    if (ch !== "#") return;
+    for (let k = 0; k < 4; k++) {
+      const px = x + i * 2 + (k & 1), py = y + j * 2 + (k >> 1);
+      if (px >= 0 && py >= 0 && px < f.w && py < f.h) f.color[py * f.w + px] = c;
+    }
+  }));
 }
 function drawMine(screen, e, time) {
   const f = screen.act, x0 = Math.round(e.x) - f.ox, y0 = Math.round(e.y) - f.oy;

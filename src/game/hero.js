@@ -266,7 +266,9 @@ export class Hero {
     const t = a.u < windGame ? s.first + a.u / s.wind : a.u - windGame;
     if (!a.spawned && t >= 0) {
       a.spawned = true;
-      g.fx.spawn(s.id, a.ox, this.y, { flip: this.face < 0, seed: (g.time * 1000) | 0, speed: a.spd, ...(g.rpg.weaponPalette() ? { palette: g.rpg.weaponPalette() } : {}) });
+      // one weapon, one look: every stroke of the combo in the first stroke's colors, or the weapon's element
+      const W = this.weapon, pal = g.rpg.weaponPalette() ?? FX[W.combo[0]].meta.options.palette;
+      g.fx.spawn(s.id, a.ox, this.y, { flip: this.face < 0, seed: (g.time * 1000) | 0, speed: a.spd, palette: pal });
       g.sfx("swing", { heavy: s.hits[0]?.stop > 0.15 });
     }
     while (a.hit < s.hits.length && t >= s.hits[a.hit].t) {
@@ -281,7 +283,7 @@ export class Hero {
     if (!this.onGround) this.vy = Math.min(this.vy + FALL_GRAV * 0.5 * dt, 220);
     else this.vy = 0;
     move(this, g.world, dt);
-    this.pose = { ...pose, x: 0, y: 0, ghost: pose.ghost };
+    this.pose = { ...pose, x: 0, y: 0, ghost: pose.ghost, ...(pose.weapon ? { weapon: this.weapon.rig, ...(this.weapon.two ? { two: true } : {}) } : {}) };
     const cancel = t > s.last + 0.1;
     if (cancel && a.queued) return this.startAttack();
     if (cancel && ctl && (inp.pressed.jump || inp.pressed.dash || Math.abs(ax) > 0 && t > s.last + 0.22)) {
